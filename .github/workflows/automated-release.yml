@@ -10,7 +10,7 @@ on:
         required: true
 
 env:
-  GH_TOKEN: ${{ secrets.RELEASE_TOKEN }}
+  GITHUB_TOKEN: ${{ secrets.RELEASE_TOKEN }}
 
 jobs:
   prepare-release:

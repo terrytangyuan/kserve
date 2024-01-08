@@ -8,6 +8,10 @@ on:
       releaseTag:
         description: 'The release tag, e.g. v0.12.0-rc0'
         required: true
+
+env:
+  GITHUB_TOKEN: ${{ secrets.RELEASE_TOKEN }}
+
 jobs:
   prepare-release:
     runs-on: ubuntu-latest
@@ -39,8 +43,8 @@ jobs:
           export RELEASE_BRANCH=${{ inputs.releaseBranch }}
           export RELEASE_TAG=${{ inputs.releaseTag }}
           make bump-version
-          ./hack/generate-install.sh $RELEASE_TAG
-          ./hack/python-release.sh
+          # ./hack/generate-install.sh $RELEASE_TAG
+          # ./hack/python-release.sh
 
       - name: Update Release Branch and Push Tag
         run: |-

@@ -1,10 +1,11 @@
-name: Agent Docker Publisher
+name: Push Images
 
 on:
   push:
     # Publish `master` as Docker `latest` image.
     branches:
       - master
+      - refactor-docker-push
 
     # Publish `v1.2.3` tags as releases.
     tags:
@@ -25,6 +26,9 @@ jobs:
   # See also https://docs.docker.com/docker-hub/builds/automated-testing/
   test:
     runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        component: [ {image: agent, path: agent}, {image: alibi-explainer, path: python/alibiexplainer} ]
 
     steps:
       - uses: actions/checkout@v2
@@ -35,7 +39,7 @@ jobs:
             docker-compose --file docker-compose.test.yml build
             docker-compose --file docker-compose.test.yml run sut
           else
-            docker buildx build . --file agent.Dockerfile
+            docker buildx build . --file ${{matrix.component.path}}.Dockerfile
           fi
 
   # Push image to GitHub Packages.
@@ -66,7 +70,7 @@ jobs:
 
       - name: export version variable
         run: |
-          IMAGE_ID=kserve/$IMAGE_NAME
+          IMAGE_ID=kserve/${{matrix.component.image}}
 
           # Change all uppercase to lowercase
           IMAGE_ID=$(echo $IMAGE_ID | tr '[A-Z]' '[a-z]')
@@ -88,6 +92,6 @@ jobs:
         with:
           platforms: linux/amd64,linux/arm/v7,linux/arm64/v8,linux/ppc64le,linux/s390x
           context: .
-          file: agent.Dockerfile
+          file: ${{matrix.component.path}}.Dockerfile
           push: true
           tags: ${{ env.IMAGE_ID }}:${{ env.VERSION }}

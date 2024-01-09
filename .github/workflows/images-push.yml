@@ -28,7 +28,7 @@ jobs:
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        component: [ {image: agent, path: agent}, {image: alibi-explainer, path: python/alibiexplainer} ]
+        component: [ {image: alibi-explainer, path: alibiexplainer}, {image: art-explainer, path: artexplainer}, {image: lgbserver, path: lgb}, {image: paddleserver, path: paddle}, {image: pmmlserver, path: pmml}, {image: xgbserver, path: xgb}, {image: storage-initializer, path: storage-initializer}, {image: sklearnserver, path: sklearn}, {image: , path: }, {image: , path: } ]
 
     steps:
       - uses: actions/checkout@v2
@@ -39,6 +39,7 @@ jobs:
             docker-compose --file docker-compose.test.yml build
             docker-compose --file docker-compose.test.yml run sut
           else
+            cd python
             docker buildx build . --file ${{matrix.component.path}}.Dockerfile
           fi
 
@@ -91,7 +92,7 @@ jobs:
         uses: docker/build-push-action@v3
         with:
           platforms: linux/amd64,linux/arm/v7,linux/arm64/v8,linux/ppc64le,linux/s390x
-          context: .
-          file: ${{matrix.component.path}}.Dockerfile
+          context: python
+          file: python/${{matrix.component.path}}.Dockerfile
           push: true
           tags: ${{ env.IMAGE_ID }}:${{ env.VERSION }}

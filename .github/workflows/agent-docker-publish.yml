@@ -1,4 +1,4 @@
-name: ARTExplainer Docker Publisher
+name: Agent Docker Publisher
 
 on:
   push:
@@ -14,7 +14,7 @@ on:
   pull_request:
 
 env:
-  IMAGE_NAME: art-explainer
+  IMAGE_NAME: agent
 
 concurrency:
   group: ${{ github.workflow }}-${{ github.ref }}
@@ -35,8 +35,7 @@ jobs:
             docker-compose --file docker-compose.test.yml build
             docker-compose --file docker-compose.test.yml run sut
           else
-            cd python
-            docker buildx build . --file artexplainer.Dockerfile
+            docker buildx build . --file agent.Dockerfile
           fi
 
   # Push image to GitHub Packages.
@@ -53,6 +52,8 @@ jobs:
 
       - name: Setup QEMU
         uses: docker/setup-qemu-action@v2
+        with:
+          platforms: ppc64le
 
       - name: Setup Docker Buildx
         uses: docker/setup-buildx-action@v2
@@ -63,7 +64,7 @@ jobs:
           username: ${{ secrets.DOCKER_USER }}
           password: ${{ secrets.DOCKER_PASSWORD }}
 
-      - name: Export version variable
+      - name: export version variable
         run: |
           IMAGE_ID=kserve/$IMAGE_NAME
 
@@ -85,8 +86,8 @@ jobs:
       - name: Build and push
         uses: docker/build-push-action@v3
         with:
-          platforms: linux/amd64, linux/arm64/v8
-          context: python
-          file: python/artexplainer.Dockerfile
+          platforms: linux/amd64,linux/arm/v7,linux/arm64/v8,linux/ppc64le,linux/s390x
+          context: .
+          file: agent.Dockerfile
           push: true
           tags: ${{ env.IMAGE_ID }}:${{ env.VERSION }}

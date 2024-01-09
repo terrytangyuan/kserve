@@ -60,6 +60,18 @@ jobs:
 
     runs-on: ubuntu-latest
     if: github.event_name == 'push'
+    strategy:
+      matrix:
+        component: [
+          { image: alibi-explainer, path: alibiexplainer },
+          { image: art-explainer, path: artexplainer },
+          { image: lgbserver, path: lgb },
+          { image: paddleserver, path: paddle },
+          { image: pmmlserver, path: pmml },
+          { image: xgbserver, path: xgb },
+          { image: storage-initializer, path: storage-initializer },
+          { image: sklearnserver, path: sklearn },
+        ]
 
     steps:
       - uses: actions/checkout@v2

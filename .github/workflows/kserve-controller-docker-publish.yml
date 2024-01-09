@@ -6,9 +6,8 @@ on:
     branches:
       - master
 
-    # Publish `v1.2.3` tags as releases.
-    tags:
-      - v*
+  release:
+    types: [ prereleased, released ]
 
   # Run tests for any PRs.
   pull_request:
@@ -45,7 +44,7 @@ jobs:
     needs: test
 
     runs-on: ubuntu-latest
-    if: github.event_name == 'push'
+    if: github.event_name == 'push' || github.event_name == 'release'
 
     steps:
       - uses: actions/checkout@v2

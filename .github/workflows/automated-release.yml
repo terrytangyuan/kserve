@@ -24,34 +24,34 @@ jobs:
           fetch-depth: 0
           ref: ${{ inputs.releaseBranch }}
 
-      - name: Install dependencies
-        run: |
-          go mod download
-
-      - name: Prepare Release
-        shell: bash
-        run: |
-          GOPATH=$(go env GOPATH)
-          KSERVE_PATH=$GOPATH/src/github.com/kserve/kserve
-          echo "KSERVE_PATH=$KSERVE_PATH" >> "$GITHUB_ENV"
-          mkdir -p $KSERVE_PATH
-          cp -a . $KSERVE_PATH
-          cd $KSERVE_PATH
-          export RELEASE_BRANCH=${{ inputs.releaseBranch }}
-          export RELEASE_TAG=${{ inputs.releaseTag }}
-          
-          # Bump Versions
-          make bump-version
-          ./hack/generate-install.sh $RELEASE_TAG
-          ./hack/python-release.sh
-          
-          # Update Release Branch and Push Tag
-          git diff
-          git config --global user.email "terrytangyuan@gmail.com"
-          git config --global user.name "terrytangyuan"
-          git add -A
-          git commit -m "Prepare release" || exit 0
-          git push
+#      - name: Install dependencies
+#        run: |
+#          go mod download
+#
+#      - name: Prepare Release
+#        shell: bash
+#        run: |
+#          GOPATH=$(go env GOPATH)
+#          KSERVE_PATH=$GOPATH/src/github.com/kserve/kserve
+#          echo "KSERVE_PATH=$KSERVE_PATH" >> "$GITHUB_ENV"
+#          mkdir -p $KSERVE_PATH
+#          cp -a . $KSERVE_PATH
+#          cd $KSERVE_PATH
+#          export RELEASE_BRANCH=${{ inputs.releaseBranch }}
+#          export RELEASE_TAG=${{ inputs.releaseTag }}
+#
+#          # Bump Versions
+#          make bump-version
+#          ./hack/generate-install.sh $RELEASE_TAG
+#          ./hack/python-release.sh
+#
+#          # Update Release Branch and Push Tag
+#          git diff
+#          git config --global user.email "terrytangyuan@gmail.com"
+#          git config --global user.name "terrytangyuan"
+#          git add -A
+#          git commit -m "Prepare release" || exit 0
+#          git push
 
       - name: Release
         uses: softprops/action-gh-release@v1

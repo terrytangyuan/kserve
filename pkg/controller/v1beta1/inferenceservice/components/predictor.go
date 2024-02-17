@@ -229,7 +229,12 @@ func (p *Predictor) Reconcile(isvc *v1beta1.InferenceService) (ctrl.Result, erro
 
 	} else {
 		container = predictor.GetContainer(isvc.ObjectMeta, isvc.Spec.Predictor.GetExtensions(), p.inferenceServiceConfig)
-
+		// Allow override container spec for custom model spec
+		if model := isvc.Spec.Predictor.Model; model != nil &&
+			&model.PredictorExtensionSpec != nil &&
+			&model.PredictorExtensionSpec.Container != nil {
+			container = &isvc.Spec.Predictor.Model.PredictorExtensionSpec.Container
+		}
 		podSpec = v1.PodSpec(isvc.Spec.Predictor.PodSpec)
 		if len(podSpec.Containers) == 0 {
 			podSpec.Containers = []v1.Container{

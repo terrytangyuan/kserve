@@ -252,6 +252,75 @@ func TestCreateCustomPredictorContainer(t *testing.T) {
 	}
 }
 
+func TestCreatePredictorCustomModelContainer(t *testing.T) {
+	var requestedResource = v1.ResourceRequirements{
+		Limits: v1.ResourceList{
+			"cpu": resource.Quantity{
+				Format: "100",
+			},
+			"memory": resource.MustParse("1Gi"),
+		},
+		Requests: v1.ResourceList{
+			"cpu": resource.Quantity{
+				Format: "90",
+			},
+			"memory": resource.MustParse("1Gi"),
+		},
+	}
+	expectedContainer := v1.Container{
+		Image:     "custom-predictor:0.1.0",
+		Name:      constants.InferenceServiceContainerName,
+		Resources: requestedResource,
+		Args: []string{
+			"--model_name",
+			"someName",
+			"--http_port",
+			"8080",
+		},
+		Env: []v1.EnvVar{
+			{
+				Name:  "STORAGE_URI",
+				Value: "hdfs://modelzoo",
+			},
+		},
+	}
+	var config = InferenceServicesConfig{}
+	g := gomega.NewGomegaWithT(t)
+	scenarios := map[string]struct {
+		isvc                  InferenceService
+		expectedContainerSpec *v1.Container
+	}{
+		"ContainerSpecWithCustomContainer": {
+			isvc: InferenceService{
+				ObjectMeta: metav1.ObjectMeta{
+					Name: "custom-predictor",
+				},
+				Spec: InferenceServiceSpec{
+					Predictor: PredictorSpec{
+						Model: &ModelSpec{
+							ModelFormat: ModelFormat{Name: "custom-model"},
+							PredictorExtensionSpec: PredictorExtensionSpec{
+								Container: expectedContainer,
+							},
+						},
+					},
+				},
+			},
+			expectedContainerSpec: &expectedContainer,
+		},
+	}
+	for name, scenario := range scenarios {
+		t.Run(name, func(t *testing.T) {
+			predictor := scenario.isvc.Spec.Predictor.GetImplementation()
+			predictor.Default(&config)
+			res := predictor.GetContainer(metav1.ObjectMeta{Name: "someName", Namespace: "default"}, &scenario.isvc.Spec.Predictor.ComponentExtensionSpec, &config)
+			if !g.Expect(res).To(gomega.Equal(scenario.expectedContainerSpec)) {
+				t.Errorf("got %q, want %q", res, scenario.expectedContainerSpec)
+			}
+		})
+	}
+}
+
 func TestCustomPredictorGetProtocol(t *testing.T) {
 	g := gomega.NewGomegaWithT(t)
 	scenarios := map[string]struct {

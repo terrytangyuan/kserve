@@ -207,13 +207,37 @@ func MergeRuntimeContainers(runtimeContainer *v1.Container, predictorContainer *
 	}
 
 	// Strategic merge patch will replace args but more useful behaviour here is to concatenate
-	mergedContainer.Args = append(append([]string{}, runtimeContainer.Args...), predictorContainer.Args...)
+	//mergedContainer.Args = append(append([]string{}, runtimeContainer.Args...), predictorContainer.Args...)
 	// Remove duplicates
-	seenArgs := make(map[string]bool)
+	type Argu struct {
+		exists bool
+		value string
+	}
+	seenArgs := make(map[string]Argu)
 	var result []string
-	for _, arg := range mergedContainer.Args {
-		if _, ok := seenArgs[arg]; !ok {
-			seenArgs[arg] = true
+	for _, arg := range runtimeContainer.Args {
+		kvs := strings.Split(arg, "=")
+		argKey := kvs[0]
+		argu, ok := seenArgs[argKey]
+		if !argu.exists {
+			result = append(result, arg)
+		}
+		if !ok {
+			if argu.value !=
+			result = append(result, arg)
+		} else {
+			seenArgs[argKey] = true
+			result = append(result, arg)
+		}
+	}
+	for _, arg := range predictorContainer.Args {
+		kvs := strings.Split(arg, "=")
+		argKey := kvs[0]
+		_, ok := seenArgs[argKey]
+		if ok {
+			result = append(result, arg)
+		} else {
+			seenArgs[argKey] = true
 			result = append(result, arg)
 		}
 	}

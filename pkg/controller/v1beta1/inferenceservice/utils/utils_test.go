@@ -693,6 +693,7 @@ func TestMergeRuntimeContainers(t *testing.T) {
 				Name:  "kserve-container",
 				Image: "default-image",
 				Args: []string{
+					"--port=3000",
 					"--foo=bar",
 					"--test=dummy",
 				},
@@ -715,6 +716,7 @@ func TestMergeRuntimeContainers(t *testing.T) {
 				Args: []string{
 					"--test=dummy",
 					"--new-arg=baz",
+					"--port=3001",
 				},
 				Env: []v1.EnvVar{
 					{Name: "PORT2", Value: "8082"},
@@ -731,6 +733,7 @@ func TestMergeRuntimeContainers(t *testing.T) {
 				Name:  "kserve-container",
 				Image: "default-image",
 				Args: []string{
+					"--port=3001",
 					"--foo=bar",
 					"--test=dummy",
 					"--new-arg=baz",

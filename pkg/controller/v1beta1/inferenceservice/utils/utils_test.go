@@ -713,6 +713,7 @@ func TestMergeRuntimeContainers(t *testing.T) {
 			},
 			containerOverride: &v1.Container{
 				Args: []string{
+					"--test=dummy",
 					"--new-arg=baz",
 				},
 				Env: []v1.EnvVar{

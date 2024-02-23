@@ -66,6 +66,9 @@ func createRawDeployment(componentMeta metav1.ObjectMeta,
 	deployment := &appsv1.Deployment{
 		ObjectMeta: componentMeta,
 		Spec: appsv1.DeploymentSpec{
+			Strategy:                componentExt.RawDeploymentSpec.Strategy,
+			RevisionHistoryLimit:    componentExt.RawDeploymentSpec.RevisionHistoryLimit,
+			ProgressDeadlineSeconds: componentExt.RawDeploymentSpec.ProgressDeadlineSeconds,
 			Selector: &metav1.LabelSelector{
 				MatchLabels: map[string]string{
 					"app": constants.GetRawServiceLabel(componentMeta.Name),

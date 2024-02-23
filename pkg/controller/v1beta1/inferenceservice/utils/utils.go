@@ -223,11 +223,14 @@ func MergeRuntimeContainers(runtimeContainer *v1.Container, predictorContainer *
 func MergePodSpec(runtimePodSpec *v1alpha1.ServingRuntimePodSpec, predictorPodSpec *v1beta1.PodSpec) (*v1.PodSpec, error) {
 
 	runtimePodSpecJson, err := json.Marshal(v1.PodSpec{
-		NodeSelector:     runtimePodSpec.NodeSelector,
-		Affinity:         runtimePodSpec.Affinity,
-		Tolerations:      runtimePodSpec.Tolerations,
-		Volumes:          runtimePodSpec.Volumes,
-		ImagePullSecrets: runtimePodSpec.ImagePullSecrets,
+		NodeSelector:                  runtimePodSpec.NodeSelector,
+		Affinity:                      runtimePodSpec.Affinity,
+		Tolerations:                   runtimePodSpec.Tolerations,
+		Volumes:                       runtimePodSpec.Volumes,
+		ImagePullSecrets:              runtimePodSpec.ImagePullSecrets,
+		TerminationGracePeriodSeconds: runtimePodSpec.TerminationGracePeriodSeconds,
+		SecurityContext:               runtimePodSpec.SecurityContext,
+		EnableServiceLinks:            runtimePodSpec.EnableServiceLinks,
 	})
 	if err != nil {
 		return nil, err

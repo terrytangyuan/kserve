@@ -128,7 +128,8 @@ func createService(componentMeta metav1.ObjectMeta, componentExt *v1beta1.Compon
 			Selector: map[string]string{
 				"app": constants.GetRawServiceLabel(componentMeta.Name),
 			},
-			Ports: servicePorts,
+			Ports:     servicePorts,
+			ClusterIP: "None",
 		},
 	}
 	return service

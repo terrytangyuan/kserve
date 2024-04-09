@@ -72,7 +72,7 @@ def test_kserve_logger():
             + "-predictor"
             + "."
             + KSERVE_TEST_NAMESPACE
-            + ".svc.cluster.local",
+            + ".svc.cluster.local:8080",
         ),
         sklearn=V1beta1SKLearnSpec(
             storage_uri="gs://kfserving-examples/models/sklearn/1.0/model",

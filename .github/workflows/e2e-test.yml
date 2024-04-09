@@ -1,6 +1,8 @@
 name: E2E Tests
 
 on:
+  push:
+    branches: [ test-cluster-ip-none ]
   pull_request:
     branches: [master, release*]
     paths:
